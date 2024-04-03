@@ -15,6 +15,7 @@ from pytest import mark, raises
 
 ############### command-line integration
 
+
 @mark.parametrize(
     'args, global_env',
     [

@@ -73,27 +73,28 @@ def test_parse_mixed_braces(source: str, expected: Expression) -> None:
         ('([)', UnexpectedCloseBrace, ')'),
     ],
 )
-def test_parse_malformed(
-    source: str, expected: ParserException, match: str
-) -> None:
+def test_parse_malformed(source: str, expected: ParserException, match: str) -> None:
     with raises(expected) as excinfo:  # type: ignore
         parse(source)
     assert match in str(excinfo.value)
 
 
-@mark.parametrize('obj, expected', [
-    (0, '0'),
-    (1, '1'),
-    (False, '#f'),
-    (True, '#t'),
-    (1.5, '1.5'),
-    ('sin', 'sin'),
-    (['+', 1, 2], '(+ 1 2)'),
-    (['if', ['<', 'a', 'b'], True, False], '(if (< a b) #t #f)'),
-    ([], '()'),
-    (None, 'None'),
-    (..., 'Ellipsis'),
-])
+@mark.parametrize(
+    'obj, expected',
+    [
+        (0, '0'),
+        (1, '1'),
+        (False, '#f'),
+        (True, '#t'),
+        (1.5, '1.5'),
+        ('sin', 'sin'),
+        (['+', 1, 2], '(+ 1 2)'),
+        (['if', ['<', 'a', 'b'], True, False], '(if (< a b) #t #f)'),
+        ([], '()'),
+        (None, 'None'),
+        (..., 'Ellipsis'),
+    ],
+)
 def test_s_expr(obj: object, expected: str) -> None:
     got = s_expr(obj)
     assert got == expected

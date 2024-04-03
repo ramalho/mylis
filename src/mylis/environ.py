@@ -6,6 +6,7 @@ import operator as op
 from .mytypes import Symbol
 from .parser import s_expr
 
+
 class Environment(collections.ChainMap):
     "A ChainMap that allows updating an item in-place."
 
@@ -28,9 +29,9 @@ def core_env() -> Environment:
             '*': op.mul,
             '/': op.truediv,
             'quotient': op.floordiv,
-            '=':  ft.partial(variadic_comparison, op.eq),
-            '<':  ft.partial(variadic_comparison, op.lt),
-            '>':  ft.partial(variadic_comparison, op.gt),
+            '=': ft.partial(variadic_comparison, op.eq),
+            '<': ft.partial(variadic_comparison, op.lt),
+            '>': ft.partial(variadic_comparison, op.gt),
             '<=': ft.partial(variadic_comparison, op.le),
             '>=': ft.partial(variadic_comparison, op.ge),
             'abs': abs,
@@ -54,8 +55,8 @@ def core_env() -> Environment:
 def display(obj: object) -> None:
     output = s_expr(obj)
     print(output)
-    
-    
+
+
 def variadic_comparison(op, current, *rest):
     for arg in rest:
         if not op(current, arg):

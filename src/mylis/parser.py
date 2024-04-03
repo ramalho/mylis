@@ -69,7 +69,7 @@ def parse_atom(token: str) -> Atom:
 # s_expr is the inverse function of parse, but some formatting
 # is lost, and all braces are rendered as ()
 def s_expr(obj: object) -> str:
-    """ Convert Python object back to s-expression code. """
+    """Convert Python object back to s-expression code."""
     match obj:
         case True:
             return '#t'

@@ -4,7 +4,6 @@ import sys
 from collections.abc import Sequence, Iterator
 from typing import Any, Protocol, NoReturn, Callable
 
-from IPython.core.error import UsageError
 from IPython.core.getipython import get_ipython
 
 if get_ipython() is None:
@@ -16,11 +15,16 @@ else:
 from .environ import Environment, core_env
 from .evaluator import evaluate
 from .mytypes import (
-    Expression, UndefinedSymbol, UnexpectedCloseBrace, EvaluatorException)
+    UndefinedSymbol,
+    UnexpectedCloseBrace,
+    EvaluatorException,
+    InterpreterException
+)
 
 from .parser import parse, tokenize, read_from_tokens, parse_atom, s_expr
 
 ############### command-line integration
+
 
 def run_lines(source: str, env: Environment | None = None) -> Iterator[Any]:
     global_env = Environment({}, core_env())
@@ -39,8 +43,7 @@ def run(source: str, env: Environment) -> Any:
 
 
 class TextReader(Protocol):
-    def read(self) -> str:
-        ...
+    def read(self) -> str: ...
 
 
 def run_file(source_file: TextReader, env: Environment) -> Any:
@@ -78,19 +81,21 @@ def raise_unexpected_paren(line: str) -> NoReturn:
     if len(line) < max_msg_len:
         msg = line
     else:
-        msg = ELLIPSIS + line[-(max_msg_len-1):]
+        msg = ELLIPSIS + line[-(max_msg_len - 1) :]
     raise UnexpectedCloseBrace(msg)
 
 
 QUIT_COMMAND = '.q'
 InputFn = Callable[[str], str]
 
-def multiline_input(prompt1: str,
-                    prompt2: str,
-                    *,
-                    quit_cmd: str = QUIT_COMMAND,
-                    input_fn: InputFn = input) -> str:
 
+def multiline_input(
+    prompt1: str,
+    prompt2: str,
+    *,
+    quit_cmd: str = QUIT_COMMAND,
+    input_fn: InputFn = input,
+) -> str:
     paren_cnt = 0
     lines = []
     prompt = prompt1
@@ -113,12 +118,14 @@ def multiline_input(prompt1: str,
     return '\n'.join(lines)
 
 
-def multiline_repl(prompt1: str = '> ',
-                   prompt2: str = '... ',
-                   error_mark: str = '***',
-                   *,
-                   quit_cmd: str = QUIT_COMMAND,
-                   input_fn: InputFn = input) -> None:
+def multiline_repl(
+    prompt1: str = '> ',
+    prompt2: str = '... ',
+    error_mark: str = '***',
+    *,
+    quit_cmd: str = QUIT_COMMAND,
+    input_fn: InputFn = input,
+) -> None:
     """Read-Eval-Print-Loop"""
 
     global_env = Environment({}, core_env())
@@ -128,9 +135,9 @@ def multiline_repl(prompt1: str = '> ',
     while True:
         # ___________________________________________ Read
         try:
-            source = multiline_input(prompt1, prompt2,
-                                     quit_cmd=quit_cmd,
-                                     input_fn=input_fn)
+            source = multiline_input(
+                prompt1, prompt2, quit_cmd=quit_cmd, input_fn=input_fn
+            )
         except (EOFError, QuitRequest):
             break
         except UnexpectedCloseBrace as exc:
@@ -164,26 +171,29 @@ def repl():
 ############### Jupyter notebook integration
 
 
-if get_ipython():
-    _jupyter_env = Environment({}, core_env())
+_jupyter_env: Environment | None = None
 
-
-def pop_arg(args: list[str], name: str) -> bool:
-    if name in args:
-        args.remove(name)
-        return True
-    return False
+def run_cell(source: str, env: Environment) -> Any:
+    tokens = tokenize(source)
+    while tokens:
+        exp = read_from_tokens(tokens)
+        result = evaluate(exp, env)
+    return result
 
 
 @register_cell_magic
 def mylis(line, cell):
-    "Evaluate cell."
-    options = line.strip().split()[1:]
-    if pop_arg(options, 'reset'):
-        _jupyter_env.clear()
-        _jupyter_env.update(core_env())
-    result = run(cell, _jupyter_env)
-    return result
+    """Evaluate cell."""
+    global _jupyter_env
+    options = line.strip().split()
+    if _jupyter_env is None or 'reset' in options:
+        _jupyter_env = Environment({}, core_env())
+    try:
+        result = run_cell(cell, _jupyter_env)
+    except InterpreterException as exc:
+        print(f'[mylis error] {exc}', file=sys.stderr)
+    else:
+        return result
 
 
 def main(args: list[str]) -> None:
