@@ -165,7 +165,7 @@ def repl():
 
 
 if get_ipython():
-    jupyter_env = Environment({}, core_env())
+    _jupyter_env = Environment({}, core_env())
 
 
 def pop_arg(args: list[str], name: str) -> bool:
@@ -180,9 +180,9 @@ def mylis(line, cell):
     "Evaluate cell."
     options = line.strip().split()[1:]
     if pop_arg(options, 'reset'):
-        jupyter_env.clear()
-        jupyter_env.update(core_env())
-    result = run(cell, jupyter_env)
+        _jupyter_env.clear()
+        _jupyter_env.update(core_env())
+    result = run(cell, _jupyter_env)
     return result
 
 
