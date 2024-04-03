@@ -1,0 +1,37 @@
+[project]
+name = "mylis"
+description = "A little Lisp derived from Norvig's lis.py"
+version = "2024.4.2"
+authors = [
+  { name="Luciano Ramalho", email="luciano@ramalho.org" },
+]
+dependencies = [
+  "pytest",
+  "ruff",
+  "dialogue-tester==1.0b5",
+  "jupyter",
+]
+requires-python = ">=3.10"
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/ramalho/mylis"
+Issues = "https://github.com/ramalho/mylis/issues"
+
+#[build-system]
+#requires = ["hatchling"]
+#build-backend = "hatchling.build"
+
+[tool.ruff.format]
+# Like Python's `repr()`, use single quotes for strings.
+quote-style = 'single'
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
