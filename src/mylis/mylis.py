@@ -18,7 +18,7 @@ from .mytypes import (
     UndefinedSymbol,
     UnexpectedCloseBrace,
     EvaluatorException,
-    InterpreterException
+    InterpreterException,
 )
 
 from .parser import parse, tokenize, read_from_tokens, parse_atom, s_expr
@@ -172,6 +172,7 @@ def repl():
 
 
 _jupyter_env: Environment | None = None
+
 
 def run_cell(source: str, env: Environment) -> Any:
     tokens = tokenize(source)
