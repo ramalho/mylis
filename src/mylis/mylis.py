@@ -182,13 +182,23 @@ def run_cell(source: str, env: Environment) -> Any:
     return result
 
 
+def turtle_env() -> Environment:
+    import jupyturtle
+    env = Environment()
+    for name in dir(jupyturtle):
+        if name.startswith('__'):
+            continue
+        env[name] = getattr(jupyturtle, name)
+    return env
+
+
 @register_cell_magic
 def mylis(line, cell):
     """Evaluate cell."""
     global _jupyter_env
     options = line.strip().split()
     if _jupyter_env is None or 'reset' in options:
-        _jupyter_env = Environment({}, core_env())
+        _jupyter_env = Environment(turtle_env(), core_env())
     try:
         result = run_cell(cell, _jupyter_env)
     except InterpreterException as exc:
