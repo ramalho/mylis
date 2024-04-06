@@ -22,14 +22,17 @@ def parse(source: str) -> Expression:
 
 BRACES = {
     '(': ')',
-    '[': ']',
     '{': '}',
 }
-CLOSE_BRACES = BRACES.values()
+CLOSE_BRACES = BRACES.values() 
 
+OPEN_QUOTE = '['
+CLOSE_QUOTE = ']'
 
 def tokenize(s: str) -> list[str]:
     """Convert a string into a list of tokens."""
+    s = s.replace(OPEN_QUOTE, '(quote (')
+    s = s.replace(CLOSE_QUOTE, '))')
     for open, close in BRACES.items():
         s = s.replace(open, f' {open} ').replace(close, f' {close} ')
     return s.split()

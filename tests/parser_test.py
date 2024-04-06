@@ -16,6 +16,7 @@ from pytest import mark, raises
         ('x', 'x'),
         ('(sum 1 2 3)', ['sum', 1, 2, 3]),
         ('(+ (* 2 100) (* 1 10))', ['+', ['*', 2, 100], ['*', 1, 10]]),
+        ('[a b c]', ['quote', ['a', 'b', 'c']]),
         ('99 100', 99),  # parse stops at the first complete expression
         ('(a)(b)', ['a']),
     ],
@@ -51,9 +52,9 @@ def test_parse(source: str, expected: Expression) -> None:
             """,
             [
                 'cond',
-                [['>', 'x', 0], 'x'],
-                [['=', 'x', 0], 0],
-                [['<', 'x', 0], ['-', 0, 'x']],
+                ['quote', [['>', 'x', 0], 'x']],
+                ['quote', [['=', 'x', 0], 0]],
+                ['quote', [['<', 'x', 0], ['-', 0, 'x']]],
             ],
         ),
     ],
@@ -68,9 +69,7 @@ def test_parse_mixed_braces(source: str, expected: Expression) -> None:
     [
         ('', ParserException, 'Empty'),
         ('{', BraceNeverClosed, '{'),
-        ('([]', BraceNeverClosed, '('),
-        ('(])', UnexpectedCloseBrace, ']'),
-        ('([)', UnexpectedCloseBrace, ')'),
+        ('({}', BraceNeverClosed, '('),
     ],
 )
 def test_parse_malformed(source: str, expected: ParserException, match: str) -> None:

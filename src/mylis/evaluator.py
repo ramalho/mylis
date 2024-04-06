@@ -22,7 +22,7 @@ class Procedure:
         return result
 
 
-KEYWORDS = 'define if quote lambda repeat'.split()
+KEYWORDS = 'define if quote lambda'.split()
 
 # Quantifiers in s-expression syntax comments:
 #   * : 0 or more
@@ -62,11 +62,6 @@ def evaluate(exp: Expression, env: Environment) -> Any:
             return exp
         case ['lambda', [*parms], *body] if len(body) > 0:  # (lambda (parm*) body+)
             return Procedure(parms, body, env)  # type: ignore[has-type]
-        case ['repeat', int(times), *body]:  # (repeat n (body*)
-            for _ in range(times):
-                for exp in body:
-                    result = evaluate(exp, env)
-            return result
         case [op, *args] if op not in KEYWORDS:  # (op exp*)
             proc = evaluate(op, env)
             values = [evaluate(arg, env) for arg in args]

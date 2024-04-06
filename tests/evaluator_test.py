@@ -75,6 +75,13 @@ def test_evaluate_quote(std_env: Environment) -> None:
     assert got == expected
 
 
+def test_evaluate_quote_braces(std_env: Environment) -> None:
+    source = '[1.1 is not 1]'
+    expected = [1.1, 'is', 'not', 1]
+    got = evaluate(parse(source), std_env)
+    assert got == expected
+
+
 def test_evaluate_lambda(std_env: Environment) -> None:
     source = '(lambda (a b) (if (>= a b) a b))'
     func = evaluate(parse(source), std_env)
@@ -141,17 +148,6 @@ def test_closure(std_env: Environment) -> None:
     """
     got = evaluate(parse(source), std_env)
     assert got == 42
-
-
-def test_repeat(capsys, std_env: Environment):
-    source = """
-        (repeat 3 
-            (display (quote ping))
-            (display (quote pong)))
-    """
-    evaluate(parse(source), std_env)
-    captured = capsys.readouterr()
-    assert captured.out == 'ping\npong\nping\npong\nping\npong\n'
 
 
 # Consistency check
