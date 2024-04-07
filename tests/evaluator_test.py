@@ -143,7 +143,6 @@ def test_closure(std_env: Environment) -> None:
     assert got == 42
 
 
-@mark.skip(reason='feature reserved for exercise')
 def test_repeat(capsys, std_env: Environment):
     source = """
         (repeat 3 
