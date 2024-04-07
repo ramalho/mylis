@@ -22,7 +22,7 @@ class Procedure:
         return result
 
 
-KEYWORDS = 'define if quote lambda repeat'.split()
+KEYWORDS = 'define if quote lambda'.split()
 
 # Quantifiers in s-expression syntax comments:
 #   * : 0 or more
@@ -33,41 +33,39 @@ KEYWORDS = 'define if quote lambda repeat'.split()
 def evaluate(exp: Expression, env: Environment) -> Any:
     "Evaluate an expression in an environment."
     match exp:
-        case int(x) | float(x):  # number literal
+        # number literal
+        case int(x) | float(x):
             return x
-        case Symbol(var):  # variable reference
+        # variable reference
+        case Symbol(var):
             try:
                 return env[var]
             except KeyError as exc:
                 raise UndefinedSymbol(var) from exc
-        case ['define', Symbol(var), value_exp]:  # (define var exp)
+        # (define var exp)
+        case ['define', Symbol(var), value_exp]:
             env[var] = evaluate(value_exp, env)
-        case [
-            'define',  # (define (name parm*)) body+)
-            [Symbol(name), *parms],
-            *body,
-        ] if len(body) > 0:
+        # (define (name parm*)) body+)
+        case ['define', [Symbol(name), *parms], *body] if len(body) > 0:
             env[name] = Procedure(parms, body, env)  # type: ignore[has-type]
-        case [
-            'if',
-            test,
-            consequence,
-            alternative,
-        ]:  # (if test consequence alternative)
+        # (if test consequence)
+        case ['if', test, consequence]:
+            if evaluate(test, env):
+                evaluate(consequence, env)
+        # (if test consequence alternative)
+        case ['if', test, consequence, alternative]:
             if evaluate(test, env):
                 return evaluate(consequence, env)
             else:
                 return evaluate(alternative, env)
-        case ['quote', exp]:  # (quote exp)
+        # (quote exp)
+        case ['quote', exp]:
             return exp
-        case ['lambda', [*parms], *body] if len(body) > 0:  # (lambda (parm*) body+)
+        # (lambda (parm*) body+)
+        case ['lambda', [*parms], *body] if len(body) > 0:
             return Procedure(parms, body, env)  # type: ignore[has-type]
-        case ['repeat', int(times), *body]:  # (repeat n (body*)
-            for _ in range(times):
-                for exp in body:
-                    result = evaluate(exp, env)
-            return result
-        case [op, *args] if op not in KEYWORDS:  # (op exp*)
+        # (op exp*)
+        case [op, *args] if op not in KEYWORDS:
             proc = evaluate(op, env)
             values = [evaluate(arg, env) for arg in args]
             return proc(*values)
