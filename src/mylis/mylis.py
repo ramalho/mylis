@@ -11,7 +11,6 @@ if get_ipython() is None:
 else:
     from IPython.core.magic import register_cell_magic
 
-
 from .environ import Environment, core_env
 from .evaluator import evaluate
 from .mytypes import (
