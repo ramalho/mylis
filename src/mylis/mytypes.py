@@ -4,10 +4,10 @@ from typing import TypeAlias
 
 # cannot use NewType because we need isinstance()
 # to support (symbol? x) in environ.py
-Symbol: TypeAlias = str
-Number: TypeAlias = int | float
-Atom: TypeAlias = int | float | Symbol
-Expression: TypeAlias = Atom | list  # type: ignore
+type Symbol = str
+type Number = int | float
+type Atom = int | float | Symbol
+type Expression = Atom | list[Expression]
 
 
 class InterpreterException(Exception):
