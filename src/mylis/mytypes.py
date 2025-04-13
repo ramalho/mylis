@@ -1,10 +1,5 @@
-from collections.abc import MutableMapping
-from typing import TypeAlias
 
-
-# cannot use NewType because we need isinstance()
-# to support (symbol? x) in environ.py
-type Symbol = str
+Symbol = str
 type Number = int | float
 type Atom = int | float | Symbol
 type Expression = Atom | list[Expression]
