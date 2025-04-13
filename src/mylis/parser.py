@@ -3,7 +3,7 @@
 ################ Scheme Interpreter in Python 3.10
 ## Based on lis.py (c) Peter Norvig, 2010-18
 ## See http://norvig.com/lispy.html
-## Refactorting and additions by Luciano Ramalho (2022)
+## Refactorting and additions by Luciano Ramalho (2022-2025)
 
 from .mytypes import (
     Atom,
