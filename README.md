@@ -1,2 +1,3 @@
 # mylis
-Dialect of lis.py—tiny dialect of Scheme—elegant dialect of Lisp.
+
+(A dialect of lis.py (Peter Norvig's tiny dialect of Scheme (the elegant dialect of Lisp)))
