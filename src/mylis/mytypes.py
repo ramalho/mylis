@@ -1,8 +1,7 @@
-
 Symbol = str
 type Number = int | float
 type Atom = int | float | Symbol
-type Expression = Atom | list[Expression]
+type Expression = Atom | list
 
 
 class InterpreterException(Exception):

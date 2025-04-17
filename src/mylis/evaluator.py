@@ -1,4 +1,3 @@
-import collections
 from typing import Any, cast
 
 from .parser import s_expr
@@ -47,7 +46,7 @@ def evaluate(exp: Expression, env: Environment) -> Any:
             [Symbol(name), *parms],
             *body,
         ] if len(body) > 0:
-            env[name] = Procedure(parms, body, env)  # type: ignore[has-type]
+            env[name] = Procedure(parms, body, env)
         case [
             'if',
             test,
@@ -61,7 +60,7 @@ def evaluate(exp: Expression, env: Environment) -> Any:
         case ['quote', exp]:  # (quote exp)
             return exp
         case ['lambda', [*parms], *body] if len(body) > 0:  # (lambda (parm*) body+)
-            return Procedure(parms, body, env)  # type: ignore[has-type]
+            return Procedure(parms, body, env)
         case ['repeat', int(times), *body]:  # (repeat n (body*)
             for _ in range(times):
                 for exp in body:

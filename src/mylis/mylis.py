@@ -182,7 +182,7 @@ def run_cell(source: str, env: Environment) -> Any:
 
 
 def turtle_env() -> Environment:
-    import jupyturtle
+    import jupyturtle  # type: ignore[import]
     env = Environment()
     for name in dir(jupyturtle):
         if name.startswith('__'):
