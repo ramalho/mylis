@@ -10,18 +10,21 @@ from pytest import mark, raises
 
 
 @mark.parametrize(
-    'source, expected',
+    'source, expected, label',
     [
-        ('7', ['7']),
-        ('x', ['x']),
-        ('(sum 1 2 3)', ['(', 'sum', '1', '2', '3', ')']),
-        ('(+ (* 2 100))', ['(', '+', '(', '*', '2', '100', ')', ')']),
-        ('{if (>= x 0) x 0}', ['{', 'if', '(', '>=', 'x', '0', ')', 'x', '0', '}']),
+        ('  7.1 ', ['7.1'], 'number'),
+        ('x y', ['x', 'y'], 'symbols'),
+        ('(sum 1 2 3)', ['(', 'sum', '1', '2', '3', ')'], 'expression'),
+        ('(+ (* 2 100))', ['(', '+', '(', '*', '2', '100', ')', ')'], 'nested expression'),
+        ('{if (>= x 0) x 0}', ['{', 'if', '(', '>=', 'x', '0', ')', 'x', '0', '}'], 'alternative brace'),
+        ('"a string"', ['"a string"'], 'string'),
+        ('"another\\string"', ['"another\\string"'], 'string with escape'),
+        (r'"string with \"escaped\" quotes"', [r'"string with \"escaped\" quotes"'], 'escaped quotes'),
     ],
 )
-def test_tokenize(source: str, expected: Expression) -> None:
+def test_tokenize(source: str, expected: Expression, label: str) -> None:
     got = tokenize(source)
-    assert got == expected
+    assert got == expected, f'FAILED: {label}'
 
 
 @mark.parametrize(

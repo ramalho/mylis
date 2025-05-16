@@ -5,6 +5,8 @@
 ## See http://norvig.com/lispy.html
 ## Refactorting and additions by Luciano Ramalho (2022-2025)
 
+import re
+
 from .mytypes import (
     Atom,
     Symbol,
@@ -27,12 +29,20 @@ BRACES = {
 }
 CLOSE_BRACES = BRACES.values()
 
+RE_TOKENS = re.compile(r'''
+        \s*  # leading whitespace
+        (
+            [(){}[\]]  # braces
+            | "(?:  # quoted string
+                [\\].    # one escaped character        
+                |[^\\"]  # OR not backlash nor quote
+                )*"  # end quoted string of len >= 0
+            | [^\s(){}[\]]+  # not spaces or braces
+        )''', re.VERBOSE)
 
 def tokenize(s: str) -> list[str]:
     """Convert a string into a list of tokens."""
-    for open, close in BRACES.items():
-        s = s.replace(open, f' {open} ').replace(close, f' {close} ')
-    return s.split()
+    return re.findall(RE_TOKENS, s)
 
 
 def read_from_tokens(tokens: list[str]) -> Expression:
