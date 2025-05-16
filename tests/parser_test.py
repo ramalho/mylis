@@ -16,6 +16,7 @@ from pytest import mark, raises
         ('x', ['x']),
         ('(sum 1 2 3)', ['(', 'sum', '1', '2', '3', ')']),
         ('(+ (* 2 100))', ['(', '+', '(', '*', '2', '100', ')', ')']),
+        ('{if (>= x 0) x 0}', ['{', 'if', '(', '>=', 'x', '0', ')', 'x', '0', '}']),
     ],
 )
 def test_tokenize(source: str, expected: Expression) -> None:
