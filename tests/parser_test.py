@@ -4,9 +4,23 @@ from mylis.mytypes import (
     UnexpectedCloseBrace,
     BraceNeverClosed,
 )
-from mylis.parser import parse, s_expr
+from mylis.parser import tokenize, parse, s_expr
 
 from pytest import mark, raises
+
+
+@mark.parametrize(
+    'source, expected',
+    [
+        ('7', ['7']),
+        ('x', ['x']),
+        ('(sum 1 2 3)', ['(', 'sum', '1', '2', '3', ')']),
+        ('(+ (* 2 100))', ['(', '+', '(', '*', '2', '100', ')', ')']),
+    ],
+)
+def test_tokenize(source: str, expected: Expression) -> None:
+    got = tokenize(source)
+    assert got == expected
 
 
 @mark.parametrize(
