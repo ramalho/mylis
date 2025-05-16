@@ -29,20 +29,22 @@ BRACES = {
 }
 CLOSE_BRACES = BRACES.values()
 
-RE_TOKENS = re.compile(r'''
-        \s*  # leading whitespace
-        (
-            [(){}[\]]  # braces
-            | "(?:  # quoted string
+x = r'"(?:[\\].|[^\\"])*"'
+
+RE_TOKEN = re.compile(r'''
+        \s*  # discard leading whitespace
+        (    # capture:
+            [(){}[\]]  # individual braces
+            | "(?:  # OR quoted string
                 [\\].    # one escaped character        
                 |[^\\"]  # OR not backlash nor quote
                 )*"  # end quoted string of len >= 0
-            | [^\s(){}[\]]+  # not spaces or braces
+            | [^\s(){}[\]]+  # OR not spaces or braces
         )''', re.VERBOSE)
 
 def tokenize(s: str) -> list[str]:
     """Convert a string into a list of tokens."""
-    return re.findall(RE_TOKENS, s)
+    return re.findall(RE_TOKEN, s)
 
 
 def read_from_tokens(tokens: list[str]) -> Expression:
