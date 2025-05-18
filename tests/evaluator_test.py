@@ -6,7 +6,7 @@ from pathlib import Path
 from mylis.environ import core_env
 from mylis.evaluator import evaluate, KEYWORDS, Environment
 from mylis.parser import parse
-from mylis.mytypes import Symbol
+from mylis.symbol import Symbol
 
 from pytest import fixture, mark
 
@@ -145,7 +145,7 @@ def test_closure(std_env: Environment) -> None:
 
 def test_repeat(capsys, std_env: Environment):
     source = """
-        (repeat 3 
+        (repeat 3
             (display (quote ping))
             (display (quote pong)))
     """

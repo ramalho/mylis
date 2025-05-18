@@ -3,7 +3,7 @@ import functools as ft
 import math
 import operator as op
 
-from .mytypes import Symbol
+from .symbol import Symbol
 from .parser import s_expr
 
 

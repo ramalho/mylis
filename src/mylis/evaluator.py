@@ -1,7 +1,8 @@
 from typing import Any, cast
 
 from .parser import s_expr
-from .mytypes import Expression, InvalidSyntax, Symbol, UndefinedSymbol
+from .mytypes import Expression, InvalidSyntax, UndefinedSymbol
+from .symbol import Symbol
 from .environ import Environment, core_env
 
 
@@ -43,10 +44,10 @@ def evaluate(exp: Expression, env: Environment) -> Any:
             env[var] = evaluate(value_exp, env)
         case [
             'define',  # (define (name parm*)) body+)
-            [Symbol(name), *parms],
+            [Symbol(var), *parms],
             *body,
         ] if len(body) > 0:
-            env[name] = Procedure(parms, body, env)
+            env[var.name] = Procedure(parms, body, env)
         case [
             'if',
             test,

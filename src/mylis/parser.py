@@ -9,12 +9,12 @@ import re
 
 from .mytypes import (
     Atom,
-    Symbol,
     Expression,
     BraceNeverClosed,
     ParserException,
     UnexpectedCloseBrace,
 )
+from .symbol import Symbol
 
 
 def parse(source: str) -> Expression:
@@ -36,7 +36,7 @@ RE_TOKEN = re.compile(r'''
         (    # capture:
             [(){}[\]]  # individual braces
             | "(?:  # OR quoted string
-                [\\].    # one escaped character        
+                [\\].    # one escaped character
                 |[^\\"]  # OR not backlash nor quote
                 )*"  # end quoted string of len >= 0
             | [^\s(){}[\]]+  # OR not spaces or braces
@@ -68,13 +68,18 @@ def read_from_tokens(tokens: list[str]) -> Expression:
 
 
 def parse_atom(token: str) -> Atom:
-    """Numbers become numbers; every other token is a symbol."""
+    """Numbers become numbers; "str" is "str", every other token is a symbol."""
     try:
         return int(token)
     except ValueError:
         try:
             return float(token)
         except ValueError:
+            prefix = token[0]
+            if prefix == '#' and token[1] in 'tf':
+                return token[1] == 't'
+            elif prefix == '"' and token[-1] == '"':
+                return token[1:-1]
             return Symbol(token)
 
 
@@ -92,5 +97,7 @@ def s_expr(obj: object) -> str:
             return f'({items})'
         case Symbol(x):
             return x
+        case str(x):
+            return f'"{x}"'
         case _:
             return repr(obj)

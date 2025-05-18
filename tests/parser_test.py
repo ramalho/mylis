@@ -4,6 +4,7 @@ from mylis.mytypes import (
     UnexpectedCloseBrace,
     BraceNeverClosed,
 )
+from mylis.symbol import Symbol as S
 from mylis.parser import tokenize, parse, s_expr
 
 from pytest import mark, raises
@@ -31,11 +32,11 @@ def test_tokenize(source: str, expected: Expression, label: str) -> None:
     'source, expected',
     [
         ('7', 7),
-        ('x', 'x'),
-        ('(sum 1 2 3)', ['sum', 1, 2, 3]),
-        ('(+ (* 2 100) (* 1 10))', ['+', ['*', 2, 100], ['*', 1, 10]]),
+        ('x', S('x')),
+        ('(sum 1 2 3)', [S('sum'), 1, 2, 3]),
+        ('(+ (* 2 100) (* 1 10))', [S('+'), [S('*'), 2, 100], [S('*'), 1, 10]]),
         ('99 100', 99),  # parse stops at the first complete expression
-        ('(a)(b)', ['a']),
+        ('(a)(b)', [S('a')]),
     ],
 )
 def test_parse(source: str, expected: Expression) -> None:
@@ -46,8 +47,8 @@ def test_parse(source: str, expected: Expression) -> None:
 @mark.parametrize(
     'source, expected',
     [
-        ('(if (< x 0) 0 x)', ['if', ['<', 'x', 0], 0, 'x']),
-        ('{if (< x 0) 0 x}', ['if', ['<', 'x', 0], 0, 'x']),
+        ('(if (< x 0) 0 x)', [S('if'), [S('<'), S('x'), 0], 0, S('x')]),
+        ('{if (< x 0) 0 x}', [S('if'), [S('<'), S('x'), 0], 0, S('x')]),
         (
             """ (cond
                     ((> x 0) x)
@@ -55,10 +56,10 @@ def test_parse(source: str, expected: Expression) -> None:
                     ((< x 0) (- 0 x)))
             """,
             [
-                'cond',
-                [['>', 'x', 0], 'x'],
-                [['=', 'x', 0], 0],
-                [['<', 'x', 0], ['-', 0, 'x']],
+                S('cond'),
+                [[S('>'), S('x'), 0], S('x')],
+                [[S('='), S('x'), 0], 0],
+                [[S('<'), S('x'), 0], [S('-'), 0, S('x')]],
             ],
         ),
         (
@@ -68,10 +69,10 @@ def test_parse(source: str, expected: Expression) -> None:
                     [(< x 0) (- 0 x)]}
             """,
             [
-                'cond',
-                [['>', 'x', 0], 'x'],
-                [['=', 'x', 0], 0],
-                [['<', 'x', 0], ['-', 0, 'x']],
+                S('cond'),
+                [[S('>'), S('x'), 0], S('x')],
+                [[S('='), S('x'), 0], 0],
+                [[S('<'), S('x'), 0], [S('-'), 0, S('x')]],
             ],
         ),
     ],
@@ -105,14 +106,14 @@ def test_parse_malformed(source: str, expected: ParserException, match: str) -> 
         (False, '#f'),
         (True, '#t'),
         (1.5, '1.5'),
-        ('sin', 'sin'),
-        (['+', 1, 2], '(+ 1 2)'),
-        (['if', ['<', 'a', 'b'], True, False], '(if (< a b) #t #f)'),
+        (S('sin'), 'sin'),
+        ('text', '"text"'),
+        ([S('+'), 1, 2], '(+ 1 2)'),
+        ([S('if'), [S('<'), S('a'), S('b')], 'A', 'B'], '(if (< a b) "A" "B")'),
         ([], '()'),
-        (None, 'None'),
-        (..., 'Ellipsis'),
     ],
 )
 def test_s_expr(obj: object, expected: str) -> None:
     got = s_expr(obj)
     assert got == expected
+    assert parse(expected) == obj
