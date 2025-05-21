@@ -65,7 +65,7 @@ IF low
     (print 'Low fuel')
 
 DEF (resto m n)
-    (- m (* n (quotient m n)))
+    (- m (* n (// m n)))
 
 DEF (mdc m n)
     IF (= n 0)
